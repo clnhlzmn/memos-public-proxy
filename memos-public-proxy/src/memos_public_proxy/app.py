@@ -16,38 +16,56 @@ MEMOS_LOG_LEVEL = os.environ.get("MEMOS_LOG_LEVEL", "ERROR")
 logger.setLevel(MEMOS_LOG_LEVEL)
 
 
-@app.route("/memos/<slug>")
-def get_memo(slug: str):
-    logger.info(f"GET /memos/{slug}")
-    response = requests.get(f"{MEMOS_PROTOCOL}://{MEMOS_HOST}/api/v1/memos/{slug}")
+def _handle_error(path: str, response: requests.Response):
+    message = json.loads(response.content.decode())["message"]
+    logger.error(f"Error ({path}): {message}")
+    return "", 404
+
+
+def _memo_path(id: str):
+    return f"/memos/{id}"
+
+
+def _file_path(attachment_name: str, filename: str):
+    return f"/file/attachments/{attachment_name}/{filename}"
+
+
+@app.route(_memo_path("<id>"))
+def get_memo(id: str):
+    path = _memo_path(id)
+    logger.info(f"GET {path}")
+    response = requests.get(f"{MEMOS_PROTOCOL}://{MEMOS_HOST}/api/v1{path}")
 
     if response.status_code != 200:
-        message = json.loads(response.content.decode())["message"]
-        logger.error(f"Error getting memo {slug}: {message}")
-        return "", 404
+        return _handle_error(path, response)
 
     body = json.loads(response.content.decode())
-    content = body["content"]
+    content: str = body["content"]
     attachments = body["attachments"]
+
     for attachment in attachments:
-        attachment_filename = attachment["filename"]
-        attachment_url = f"/file/{attachment['name']}/{attachment_filename}"
-        content = f"{content}\n\n[{attachment_filename}]({attachment_url})"
-    html = markdown.markdown(content)
-    return html
+
+        filename = attachment["filename"]
+        id = attachment["name"].split("/")[1]
+        path = _file_path(id, filename)
+
+        if attachment["type"].startswith("image"):
+            image = f'<img src="{path}" alt="{filename}" width="500"/>'
+            content = f"{content}\n\n{image}"
+        else:
+            link = f"[{filename}]({path})"
+            content = f"{content}\n\n{link}"
+
+    return markdown.markdown(content)
 
 
-@app.route("/file/attachments/<slug>/<filename>")
-def get_attachment(slug: str, filename: str):
-    logger.info(f"GET /file/attachments/{slug}/{filename}")
-    memos_response = requests.get(f"{MEMOS_PROTOCOL}://{MEMOS_HOST}/file/attachments/{slug}/{filename}")
+@app.route(_file_path("<id>", "<filename>"))
+def get_attachment(id: str, filename: str):
+    path = _file_path(id, filename)
+    logger.info(f"GET {path}")
+    response = requests.get(f"{MEMOS_PROTOCOL}://{MEMOS_HOST}{path}")
 
-    if memos_response.status_code != 200:
-        message = json.loads(memos_response.content.decode())["message"]
-        logger.error(f"Error getting memo {slug}: {message}")
-        return "", 404
+    if response.status_code != 200:
+        return _handle_error(path, response)
 
-    response = flask.make_response(memos_response.content)
-    response.headers.set("Content-Type", memos_response.headers["Content-Type"])
-    response.headers.set("Content-Disposition", "attachment", filename=filename)
-    return response
+    return response.content, response.status_code, response.headers.items()
