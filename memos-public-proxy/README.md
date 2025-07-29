@@ -1,0 +1,1 @@
+to run: from memos-public-proxy do `gunicorn -w 4 --log-level INFO --capture-output 'src.memos_public_proxy.app:app'`

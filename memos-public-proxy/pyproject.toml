@@ -1,0 +1,26 @@
+[project]
+name = "memos-public-proxy"
+version = "0.1.0"
+description = ""
+authors = [
+    {name = "Colin"}
+]
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "flask (>=3.1.1,<4.0.0)",
+    "gunicorn (>=23.0.0,<24.0.0)",
+    "requests (>=2.32.4,<3.0.0)",
+    "markdown (>=3.8.2,<4.0.0)",
+]
+
+[tool.poetry]
+packages = [{include = "memos_public_proxy", from = "src"}]
+
+
+[tool.poetry.group.dev.dependencies]
+black = "^25.1.0"
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
