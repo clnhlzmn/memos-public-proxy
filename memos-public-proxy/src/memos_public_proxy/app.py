@@ -11,7 +11,7 @@ app = flask.Flask("memos-public-proxy")
 
 MEMOS_PROTOCOL = os.environ.get("MEMOS_PROTOCOL", "http")
 MEMOS_HOST = os.environ.get("MEMOS_HOST", "memos")
-MEMOS_LOG_LEVEL = os.environ.get("MEMOS_LOG_LEVEL", "ERROR")
+MEMOS_LOG_LEVEL = os.environ.get("MEMOS_LOG_LEVEL", "ERROR").upper()
 
 logger.setLevel(MEMOS_LOG_LEVEL)
 
