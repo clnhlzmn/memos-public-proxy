@@ -8,6 +8,20 @@ Share your public [memos](https://github.com/usememos/memos) in a safe way witho
 
 I was inspired by the approach taken by immich-public-proxy and I wanted something similar for memos. The memos app already has a concept of public and private visibility, and memos by default are identified by long random strings. What memos-public-proxy does is provide a locked down route for the public to access those public memos without exposing the rest of the memos instance (auth, api, etc..).
 
+# Example
+
+Create a memo:
+
+![Create a memo](docs/SCR-20250730-oryi.png)
+
+Copy the link:
+
+![Copy the link](docs/SCR-20250730-osay.png)
+
+Share it:
+
+![Share it](docs/SCR-20250730-otss.png)
+
 # Installation
 
 Example docker compose:
@@ -46,6 +60,7 @@ services:
     restart: unless-stopped
     environment:
       MEMOS_HOST: memos # Connect to memos API through docker net using the service name
+      MEMOS_PORT: 5230 # Should be the internal port of the memos instance on the docker network
       MEMOS_LOG_LEVEL: info
     ports:
       - 127.0.0.1:8467:5000
