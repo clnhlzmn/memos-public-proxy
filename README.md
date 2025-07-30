@@ -79,7 +79,7 @@ Example proxy config (caddy):
 }
 
 *.public.example.com {
-    # The following proxies memos.public.example.com to the memos server (accessible from any IP).
+    # The following proxies memos.public.example.com to the memos-public-proxy server (accessible from any IP).
     @memos host memos.public.example.com
     reverse_proxy @memos 127.0.0.1:8467
 }
