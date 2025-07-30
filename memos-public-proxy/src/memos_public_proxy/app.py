@@ -14,7 +14,7 @@ MEMOS_HOST = os.environ.get("MEMOS_HOST", "memos")
 MEMOS_PORT = os.environ.get("MEMOS_PORT", "5230")
 MEMOS_LOG_LEVEL = os.environ.get("MEMOS_LOG_LEVEL", "ERROR").upper()
 
-MEMOS_CONNECTION = f"{MEMOS_PROTOCOL}://{MEMOS_HOST}:${MEMOS_PORT}"
+MEMOS_CONNECTION = f"{MEMOS_PROTOCOL}://{MEMOS_HOST}:{MEMOS_PORT}"
 
 logger.setLevel(MEMOS_LOG_LEVEL)
 
