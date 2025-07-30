@@ -24,6 +24,7 @@ FROM base AS final
 
 ENV MEMOS_PROTOCOL=http
 ENV MEMOS_HOST=memos
+ENV MEMOS_PORT=5230
 ENV MEMOS_LOG_LEVEL=error
 
 COPY --from=builder /app/.venv ./.venv

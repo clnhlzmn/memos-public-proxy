@@ -11,7 +11,10 @@ app = flask.Flask("memos-public-proxy")
 
 MEMOS_PROTOCOL = os.environ.get("MEMOS_PROTOCOL", "http")
 MEMOS_HOST = os.environ.get("MEMOS_HOST", "memos")
+MEMOS_PORT = os.environ.get("MEMOS_PORT", "5230")
 MEMOS_LOG_LEVEL = os.environ.get("MEMOS_LOG_LEVEL", "ERROR").upper()
+
+MEMOS_CONNECTION = f"{MEMOS_PROTOCOL}://{MEMOS_HOST}:${MEMOS_PORT}
 
 logger.setLevel(MEMOS_LOG_LEVEL)
 
@@ -34,7 +37,7 @@ def _file_path(attachment_name: str, filename: str):
 def get_memo(id: str):
     path = _memo_path(id)
     logger.info(f"GET {path}")
-    response = requests.get(f"{MEMOS_PROTOCOL}://{MEMOS_HOST}/api/v1{path}")
+    response = requests.get(f"{MEMOS_CONNECTION}/api/v1{path}")
 
     if response.status_code != 200:
         return _handle_error(path, response)
@@ -63,7 +66,7 @@ def get_memo(id: str):
 def get_attachment(id: str, filename: str):
     path = _file_path(id, filename)
     logger.info(f"GET {path}")
-    response = requests.get(f"{MEMOS_PROTOCOL}://{MEMOS_HOST}{path}")
+    response = requests.get(f"{MEMOS_CONNECTION}{path}")
 
     if response.status_code != 200:
         return _handle_error(path, response)
