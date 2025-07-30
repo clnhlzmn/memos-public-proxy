@@ -31,5 +31,7 @@ COPY --from=builder /app/.venv ./.venv
 COPY --from=builder /app/dist .
 COPY docker-entrypoint.sh .
 
+EXPOSE 5000
+
 RUN ./.venv/bin/pip install *.whl
 CMD ["./docker-entrypoint.sh"]

@@ -6,16 +6,17 @@ authors = [
     {name = "Colin"}
 ]
 readme = "README.md"
-requires-python = ">=3.11"
+requires-python = ">=3.11,<4"
 dependencies = [
     "flask (>=3.1.1,<4.0.0)",
     "gunicorn (>=23.0.0,<24.0.0)",
     "requests (>=2.32.4,<3.0.0)",
-    "markdown (>=3.8.2,<4.0.0)",
+    "markdown2 (>=2.5.4,<3.0.0)",
 ]
 
 [tool.poetry]
 packages = [{include = "memos_public_proxy", from = "src"}]
+include = [{path = "src/memos_public_proxy/style/*.css", format = ["sdist", "wheel"]}]
 
 
 [tool.poetry.group.dev.dependencies]

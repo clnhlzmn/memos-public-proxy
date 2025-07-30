@@ -2,8 +2,10 @@ import flask
 import requests
 import os
 import json
-import markdown
+import markdown2
 import logging
+import pathlib
+import re
 
 logger = logging.getLogger(__name__)
 
@@ -15,6 +17,10 @@ MEMOS_PORT = os.environ.get("MEMOS_PORT", "5230")
 MEMOS_LOG_LEVEL = os.environ.get("MEMOS_LOG_LEVEL", "ERROR").upper()
 
 MEMOS_CONNECTION = f"{MEMOS_PROTOCOL}://{MEMOS_HOST}:{MEMOS_PORT}"
+
+HASHTAG_PATTERN = re.compile(r"#[^\s]+")
+
+STYLE = "\n".join(p.read_text() for p in (pathlib.Path(__file__).parent / "style").glob("*.css"))
 
 logger.setLevel(MEMOS_LOG_LEVEL)
 
@@ -44,7 +50,24 @@ def get_memo(id: str):
 
     body = json.loads(response.content.decode())
     content: str = body["content"]
-    attachments = body["attachments"]
+    attachments: list = body["attachments"]
+
+    # Escape hashtags in the first and last lines
+    lines = content.split("\n")
+    if lines:
+        lines[0] = re.sub(HASHTAG_PATTERN, lambda m: rf"\{m.group(0)}", lines[0])
+        lines[-1] = re.sub(HASHTAG_PATTERN, lambda m: rf"\{m.group(0)}", lines[-1])
+    content = "\n".join(lines)
+
+    # Prepend the style
+    content = f"""
+<style type="text/css" rel="stylesheet">
+{STYLE}
+</style>
+{content}
+"""
+
+    attachments.sort(key = lambda a: not a["type"].startswith("image")) # Sort images first
 
     for attachment in attachments:
 
@@ -59,7 +82,7 @@ def get_memo(id: str):
             link = f"[{filename}]({path})"
             content = f"{content}\n\n{link}"
 
-    return markdown.markdown(content)
+    return markdown2.markdown(content)
 
 
 @app.route(_file_path("<id>", "<filename>"))
