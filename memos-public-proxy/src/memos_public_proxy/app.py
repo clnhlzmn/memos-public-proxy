@@ -10,6 +10,7 @@ app = flask.Flask("memos-public-proxy")
 
 MEMOS_HOST = os.environ.get("MEMOS_HOST", "http://memos:5230")
 MEMOS_LOG_LEVEL = os.environ.get("MEMOS_LOG_LEVEL", "ERROR").upper()
+MEMOS_CACHE_PATH = os.environ.get("MEMOS_CACHE_PATH", "/cache")
 
 HASHTAG_PATTERN = re.compile(r"#[^\s]+")
 STYLE = "\n".join(p.read_text() for p in (pathlib.Path(__file__).parent / "style").glob("*.css"))
@@ -43,6 +44,15 @@ def get_memo(id: str):
     body = json.loads(response.content.decode())
     content: str = body["content"]
     attachments: list = body["attachments"]
+    update_time: str = body["updateTime"]
+
+    # First check the cache
+    cache_path = pathlib.Path(f"{MEMOS_CACHE_PATH}/{id}/{update_time}")
+    if cache_path.exists():
+        app.logger.info(f"memo {id} found in cache")
+        return cache_path.read_text()
+
+    app.logger.info(f"memo {id} not found in cache, generating html")
 
     # Escape hashtags in the first and last lines
     lines = content.split("\n")
@@ -68,11 +78,16 @@ def get_memo(id: str):
         path = _file_path(id, filename)
 
         if attachment["type"].startswith("image"):
-            image = f'<img src="{path}" alt="{filename}" width="500"/>'
+            image = f'<a href="{path}"><img src="{path}" alt="{filename}" width="500"/></a>'
             content = f"{content}\n\n{image}"
         else:
             link = f"[{filename}]({path})"
             content = f"{content}\n\n{link}"
+
+    # Update the cache
+    html_content = markdown2.markdown(content)
+    cache_path.parent.mkdir(parents=True, exist_ok=True)
+    cache_path.write_text(html_content)
 
     return markdown2.markdown(content)
 
