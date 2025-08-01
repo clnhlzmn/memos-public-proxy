@@ -3,31 +3,23 @@ import requests
 import os
 import json
 import markdown2
-import logging
 import pathlib
 import re
 
-logger = logging.getLogger(__name__)
-
 app = flask.Flask("memos-public-proxy")
 
-MEMOS_PROTOCOL = os.environ.get("MEMOS_PROTOCOL", "http")
-MEMOS_HOST = os.environ.get("MEMOS_HOST", "memos")
-MEMOS_PORT = os.environ.get("MEMOS_PORT", "5230")
+MEMOS_HOST = os.environ.get("MEMOS_HOST", "http://memos:5230")
 MEMOS_LOG_LEVEL = os.environ.get("MEMOS_LOG_LEVEL", "ERROR").upper()
 
-MEMOS_CONNECTION = f"{MEMOS_PROTOCOL}://{MEMOS_HOST}:{MEMOS_PORT}"
-
 HASHTAG_PATTERN = re.compile(r"#[^\s]+")
-
 STYLE = "\n".join(p.read_text() for p in (pathlib.Path(__file__).parent / "style").glob("*.css"))
 
-logger.setLevel(MEMOS_LOG_LEVEL)
+app.logger.setLevel(MEMOS_LOG_LEVEL)
 
 
 def _handle_error(path: str, response: requests.Response):
     message = json.loads(response.content.decode())["message"]
-    logger.error(f"Error ({path}): {message}")
+    app.logger.error(f"({path}): {message}")
     return "", 404
 
 
@@ -42,8 +34,8 @@ def _file_path(attachment_name: str, filename: str):
 @app.route(_memo_path("<id>"))
 def get_memo(id: str):
     path = _memo_path(id)
-    logger.info(f"GET {path}")
-    response = requests.get(f"{MEMOS_CONNECTION}/api/v1{path}")
+    app.logger.info(f"GET {path}")
+    response = requests.get(f"{MEMOS_HOST}/api/v1{path}")
 
     if response.status_code != 200:
         return _handle_error(path, response)
@@ -67,7 +59,7 @@ def get_memo(id: str):
 {content}
 """
 
-    attachments.sort(key = lambda a: not a["type"].startswith("image")) # Sort images first
+    attachments.sort(key=lambda a: not a["type"].startswith("image"))  # Sort images first
 
     for attachment in attachments:
 
@@ -88,8 +80,8 @@ def get_memo(id: str):
 @app.route(_file_path("<id>", "<filename>"))
 def get_attachment(id: str, filename: str):
     path = _file_path(id, filename)
-    logger.info(f"GET {path}")
-    response = requests.get(f"{MEMOS_CONNECTION}{path}")
+    app.logger.info(f"GET {path}")
+    response = requests.get(f"{MEMOS_HOST}{path}")
 
     if response.status_code != 200:
         return _handle_error(path, response)

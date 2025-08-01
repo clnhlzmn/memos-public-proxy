@@ -4,27 +4,46 @@ Share your public [memos](https://github.com/usememos/memos) in a safe way witho
 
 > TODO: A live demo
 
+# Content
+
+* [About](#about)
+* [Usage](#usage)
+* [Installation](#installation)
+  * [Settings](#settings)
+  * [Example Docker Compose](#example-docker-compose-file)
+  * [Example Caddy Config](#example-caddy-config)
+* [Dev Notes](#dev-notes)
+
+
+
 # About
 
 I was inspired by the approach taken by immich-public-proxy and I wanted something similar for memos. The memos app already has a concept of public and private visibility, and memos by default are identified by long random strings. What memos-public-proxy does is provide a locked down route for the public to access those public memos without exposing the rest of the memos instance (auth, api, etc..).
 
-# Example
+# Usage
 
-Create a memo:
+## Create a public memo
 
-![Create a memo](docs/SCR-20250730-oryi.png)
+![Create a memo](docs/SCR-20250801-mwyg.png)
 
-Copy the link:
+## Copy the link
 
-![Copy the link](docs/SCR-20250730-osay.png)
+![Copy the link](docs/SCR-20250801-mwzq.png)
 
-Share it:
+## Share it
 
-![Share it](docs/SCR-20250730-otss.png)
+![Share it](docs/SCR-20250801-myat.png)
 
 # Installation
 
-Example docker compose:
+## Settings
+
+| Variable | Description | Default |
+| - | - | - |
+| `MEMOS_LOG_LEVEL` | Log level for the proxy application and for the Gunicorn server. Uses [Gunicorn levels](https://docs.gunicorn.org/en/stable/settings.html#loglevel) | `error` |
+| `MEMOS_HOST` | The scheme and authority part of the URL for the Memos server instance. | http://memos:5230 |
+
+# Example Docker Compose File
 
 ```yaml
 services:
@@ -40,8 +59,8 @@ services:
     environment:
       MEMOS_DRIVER: postgres
       MEMOS_DSN: "user=memos password=secret dbname=memosdb host=db sslmode=disable"
-      # The memos variable `MEMOS_INSTANCE_URL` doesn't do anything in the latest release (0.25.0 as of this writing) which is why I'm using the canary tag. See the note below.
-      MEMOS_INSTANCE_URL: <your public memos url>
+      # The Memos variable `MEMOS_INSTANCE_URL` doesn't do anything in the latest release (0.25.0 as of this writing) which is why I'm using the canary tag. See the note below.
+      MEMOS_INSTANCE_URL: <your public Memos url>
     volumes:
       - ./server-data:/var/opt/memos
 
@@ -59,14 +78,13 @@ services:
     image: ghcr.io/clnhlzmn/memos-public-proxy:main
     restart: unless-stopped
     environment:
-      MEMOS_HOST: memos # Connect to memos API through docker net using the service name
-      MEMOS_PORT: 5230 # Should be the internal port of the memos instance on the docker network
+      # MEMOS_HOST: http://memos:5230 # Not necessary, the default works in this example.
       MEMOS_LOG_LEVEL: info
     ports:
       - 127.0.0.1:8467:5000
 ```
 
-Example proxy config (caddy):
+## Example Caddy Config
 
 ```yaml
 *.private.example.com {
@@ -85,10 +103,9 @@ Example proxy config (caddy):
 }
 ```
 
-> Note: [This PR](https://github.com/usememos/memos/pull/4930) adds support for using the `MEMOS_INSTANCE_URL` when copying a memo link using the "Copy Link" button. What does this mean? You can visit your memos instance at memos.private.example.com, create a public memo, click "Copy Link", and have a ready-to-share public link of the form `memos.public.example.com/memos/<memo id>`.
-* 
+> Note: [This PR](https://github.com/usememos/memos/pull/4930) adds support for using the `MEMOS_INSTANCE_URL` when copying a memo link using the "Copy Link" button. What does this mean? You can visit your Memos instance at memos.private.example.com, create a public memo, click "Copy Link", and have a ready-to-share public link of the form `memos.public.example.com/memos/<memo id>`.
 
-# Dev
+# Dev Notes
 
 ## Building
 
