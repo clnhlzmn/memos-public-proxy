@@ -1,6 +1,6 @@
 # Memos Public Proxy
 
-Share your public [memos](https://github.com/usememos/memos) in a safe way without exposing your memos instance to the public (inspired by [immich-public-proxy](https://github.com/alangrainger/immich-public-proxy)).
+Share your public [Memos](https://github.com/usememos/memos) in a safe way without exposing your Memos server to the public (inspired by [Immich Public Proxy](https://github.com/alangrainger/immich-public-proxy)).
 
 > TODO: A live demo
 
@@ -18,7 +18,7 @@ Share your public [memos](https://github.com/usememos/memos) in a safe way witho
 
 # About
 
-I was inspired by the approach taken by immich-public-proxy and I wanted something similar for memos. The memos app already has a concept of public and private visibility, and memos by default are identified by long random strings. What memos-public-proxy does is provide a locked down route for the public to access those public memos without exposing the rest of the memos instance (auth, api, etc..).
+I was inspired by the approach taken by Immich Public Proxy and I wanted something similar for Memos. The Memos app already has a concept of public and private visibility, and memos are identified by long random strings. What Memos Public Proxy does is provide a locked down route for the public to access those public memos without exposing the rest of the Memos instance (auth, api, etc..).
 
 # Usage
 
@@ -45,6 +45,8 @@ I was inspired by the approach taken by immich-public-proxy and I wanted somethi
 
 # Example Docker Compose File
 
+> Note: [This PR](https://github.com/usememos/memos/pull/4930) adds support for using `MEMOS_INSTANCE_URL` when copying a memo link using the "Copy Link" button. What does this mean? You can visit your Memos instance at memos.private.example.com, create a public memo, click "Copy Link", and have a ready-to-share public link of the form `memos.public.example.com/memos/<memo id>`.
+
 ```yaml
 services:
 
@@ -59,8 +61,9 @@ services:
     environment:
       MEMOS_DRIVER: postgres
       MEMOS_DSN: "user=memos password=secret dbname=memosdb host=db sslmode=disable"
-      # The Memos variable `MEMOS_INSTANCE_URL` doesn't do anything in the latest release (0.25.0 as of this writing) which is why I'm using the canary tag. See the note below.
-      MEMOS_INSTANCE_URL: <your public Memos url>
+      # The Memos variable `MEMOS_INSTANCE_URL` doesn't do anything in the latest
+      # release (0.25.0 as of this writing) which is why I'm using the canary tag.
+      MEMOS_INSTANCE_URL: memos.public.example.com
     volumes:
       - ./server-data:/var/opt/memos
 
@@ -91,19 +94,19 @@ services:
     @denied not remote_ip private_ranges
     abort @denied
 
-    # The following proxies memos.private.example.com to the memos server (accessible from local IPs only).
+    # The following proxies memos.private.example.com to
+    # the Memos server (accessible from local IPs only).
     @memos host memos.private.example.com
     reverse_proxy @memos 127.0.0.1:5230
 }
 
 *.public.example.com {
-    # The following proxies memos.public.example.com to the memos-public-proxy server (accessible from any IP).
+    # The following proxies memos.public.example.com to
+    # the memos-public-proxy server (accessible from any IP).
     @memos host memos.public.example.com
     reverse_proxy @memos 127.0.0.1:8467
 }
 ```
-
-> Note: [This PR](https://github.com/usememos/memos/pull/4930) adds support for using the `MEMOS_INSTANCE_URL` when copying a memo link using the "Copy Link" button. What does this mean? You can visit your Memos instance at memos.private.example.com, create a public memo, click "Copy Link", and have a ready-to-share public link of the form `memos.public.example.com/memos/<memo id>`.
 
 # Dev Notes
 
