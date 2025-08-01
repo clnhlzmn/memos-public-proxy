@@ -39,9 +39,9 @@ I was inspired by the approach taken by Immich Public Proxy and I wanted somethi
 ## Settings
 
 | Variable | Description | Default |
-| - | - | - |
+| --- | --- | --- |
 | `MEMOS_LOG_LEVEL` | Log level for the proxy application and for the Gunicorn server. Uses [Gunicorn levels](https://docs.gunicorn.org/en/stable/settings.html#loglevel). | `error` |
-| `MEMOS_HOST` | The scheme and authority part of the URL for the Memos server instance. | http://memos:5230 |
+| `MEMOS_HOST` | The URL for the Memos server instance. | http://memos:5230 |
 
 # Example Docker Compose File
 
