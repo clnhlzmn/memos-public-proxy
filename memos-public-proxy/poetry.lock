@@ -291,6 +291,18 @@ MarkupSafe = ">=2.0"
 i18n = ["Babel (>=2.7)"]
 
 [[package]]
+name = "latex2mathml"
+version = "3.78.0"
+description = "Pure Python library for LaTeX to MathML conversion"
+optional = false
+python-versions = ">=3.9"
+groups = ["main"]
+files = [
+    {file = "latex2mathml-3.78.0-py3-none-any.whl", hash = "sha256:1aeca3dc027b3006ad7b301b7f4a15ffbb4c1451e3dc8c3389e97b37b497e1d6"},
+    {file = "latex2mathml-3.78.0.tar.gz", hash = "sha256:712193aa4c6ade1a8e0145dac7bc1f9aafbd54f93046a2356a7e1c05fa0f8b31"},
+]
+
+[[package]]
 name = "markdown2"
 version = "2.5.4"
 description = "A fast and complete Python implementation of Markdown"
@@ -433,6 +445,21 @@ test = ["appdirs (==1.4.4)", "covdefaults (>=2.3)", "pytest (>=8.3.4)", "pytest-
 type = ["mypy (>=1.14.1)"]
 
 [[package]]
+name = "pygments"
+version = "2.19.2"
+description = "Pygments is a syntax highlighting package written in Python."
+optional = false
+python-versions = ">=3.8"
+groups = ["main"]
+files = [
+    {file = "pygments-2.19.2-py3-none-any.whl", hash = "sha256:86540386c03d588bb81d44bc3928634ff26449851e99741617ecb9037ee5ec0b"},
+    {file = "pygments-2.19.2.tar.gz", hash = "sha256:636cb2477cec7f8952536970bc533bc43743542f70392ae026374600add5b887"},
+]
+
+[package.extras]
+windows-terminal = ["colorama (>=0.4.6)"]
+
+[[package]]
 name = "requests"
 version = "2.32.4"
 description = "Python HTTP for Humans."
@@ -493,4 +520,4 @@ watchdog = ["watchdog (>=2.3)"]
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.11,<4"
-content-hash = "93d09bf0c1308f90c073b051f89143d41145e59c71030c335f4a20c691673578"
+content-hash = "bafd50ca200ff8dd53b9f8a38a08ec4839f023207a1b912f8224f6fd89a12d9e"

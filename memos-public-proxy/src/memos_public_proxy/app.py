@@ -11,6 +11,16 @@ app = flask.Flask("memos-public-proxy")
 MEMOS_HOST = os.environ.get("MEMOS_HOST", "http://memos:5230")
 MEMOS_LOG_LEVEL = os.environ.get("MEMOS_LOG_LEVEL", "ERROR").upper()
 MEMOS_CACHE_PATH = os.environ.get("MEMOS_CACHE_PATH", "/cache")
+EXTRAS = [
+    "tables",
+    "todo_list",
+    "strike",
+    "fenced-code-blocks",
+    "cuddled-lists",
+    "header-ids",
+    "latex",
+    "mermaid",
+]
 
 HASHTAG_PATTERN = re.compile(r"#[^\s]+")
 STYLE = "\n".join(p.read_text() for p in (pathlib.Path(__file__).parent / "style").glob("*.css"))
@@ -85,11 +95,11 @@ def get_memo(id: str):
             content = f"{content}\n\n{link}"
 
     # Update the cache
-    html_content = markdown2.markdown(content)
+    html_content = markdown2.markdown(content, extras=EXTRAS)
     cache_path.parent.mkdir(parents=True, exist_ok=True)
     cache_path.write_text(html_content)
 
-    return markdown2.markdown(content)
+    return html_content
 
 
 @app.route(_file_path("<id>", "<filename>"))
