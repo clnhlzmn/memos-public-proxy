@@ -13,7 +13,7 @@ MEMOS_LOG_LEVEL = os.environ.get("MEMOS_LOG_LEVEL", "ERROR").upper()
 MEMOS_CACHE_PATH = os.environ.get("MEMOS_CACHE_PATH", "/cache")
 EXTRAS = [
     "tables",
-    "todo_list",
+    "task_list",
     "strike",
     "fenced-code-blocks",
     "cuddled-lists",
