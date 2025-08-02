@@ -2,7 +2,7 @@
 
 Share your public [Memos](https://github.com/usememos/memos) in a safe way without exposing your Memos server to the public (inspired by [Immich Public Proxy](https://github.com/alangrainger/immich-public-proxy)).
 
-> TODO: A live demo
+[Live demo](https://memos.share.holzman.ch/memos/o7nBhM3gUPUqaxLBgxCj3X)
 
 # Content
 
