@@ -23,7 +23,7 @@ EXTRAS = [
 ]
 
 HASHTAG_PATTERN = re.compile(r"#[^\s]+")
-STYLE = "\n".join(p.read_text() for p in (pathlib.Path(__file__).parent / "style").glob("*.css"))
+HTML = "\n".join(p.read_text() for p in (pathlib.Path(__file__).parent / "html").glob("*.html"))
 
 app.logger.setLevel(MEMOS_LOG_LEVEL)
 
@@ -71,13 +71,8 @@ def get_memo(id: str):
         lines[-1] = re.sub(HASHTAG_PATTERN, lambda m: rf"\{m.group(0)}", lines[-1])
     content = "\n".join(lines)
 
-    # Prepend the style
-    content = f"""
-<style type="text/css" rel="stylesheet">
-{STYLE}
-</style>
-{content}
-"""
+    # Prepend other HTML
+    content = f"{HTML}\n\n{content}"
 
     attachments.sort(key=lambda a: not a["type"].startswith("image"))  # Sort images first
 
