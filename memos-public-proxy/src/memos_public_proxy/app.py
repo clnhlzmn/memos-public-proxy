@@ -5,6 +5,8 @@ import json
 import markdown2
 import pathlib
 import re
+import html
+import urllib.parse
 
 app = flask.Flask("memos-public-proxy")
 
@@ -30,7 +32,10 @@ app.logger.setLevel(MEMOS_LOG_LEVEL)
 
 
 def _handle_error(path: str, response: requests.Response):
-    message = json.loads(response.content.decode())["message"]
+    try:
+        message = json.loads(response.content.decode())["message"]
+    except Exception as e:
+        message = str(e)
     app.logger.error(f"({path}): {message}")
     return "", 404
 
@@ -58,7 +63,8 @@ def get_memo(id: str):
     update_time: str = body["updateTime"]
 
     # First check the cache
-    cache_path = pathlib.Path(f"{MEMOS_CACHE_PATH}/{id}/{update_time}")
+    update_time_slug = re.sub(r'[^a-zA-Z0-9\-]', '_', update_time)
+    cache_path = pathlib.Path(f"{MEMOS_CACHE_PATH}/{id}/{update_time_slug}")
     if cache_path.exists():
         app.logger.info(f"memo {id} found in cache")
         return cache_path.read_text()
@@ -78,16 +84,19 @@ def get_memo(id: str):
     attachments.sort(key=lambda a: not a["type"].startswith("image"))  # Sort images first
 
     for attachment in attachments:
-
         filename = attachment["filename"]
-        id = attachment["name"].split("/")[1]
-        path = _file_path(id, filename)
+        parts = attachment["name"].split("/")
+        if len(parts) < 2:
+            continue
+        attachment_id = parts[1]
+        encoded_path = _file_path(attachment_id, urllib.parse.quote(filename))
+        filename_escaped = html.escape(filename)
 
         if attachment["type"].startswith("image"):
-            image = f'<a href="{path}"><img src="{path}" alt="{filename}" width="500"/></a>'
+            image = f'<a href="{encoded_path}"><img src="{encoded_path}" alt="{filename_escaped}" width="500"/></a>'
             content = f"{content}\n\n{image}"
         else:
-            link = f"[{filename}]({path})"
+            link = f"[{filename_escaped}]({encoded_path})"
             content = f"{content}\n\n{link}"
 
     # Update the cache
