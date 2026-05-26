@@ -16,17 +16,17 @@ COPY memos-public-proxy .
 RUN poetry config virtualenvs.in-project true && \
     poetry install --only=main --no-root && \
     poetry build && \
-    ./.venv/bin/pip install ./dist/*.whl && \
-    ln -sf /usr/bin/python /app/.venv/bin/python
+    ./.venv/bin/pip install ./dist/*.whl
 
-FROM gcr.io/distroless/python3
+FROM gcr.io/distroless/python3-debian12
 
 ENV MEMOS_HOST=http://memos:5230
 ENV MEMOS_LOG_LEVEL=error
+ENV PYTHONPATH=/venv/lib/python3.11/site-packages
 
 COPY --from=builder /app/.venv /venv
 
 EXPOSE 5000
 
-ENTRYPOINT ["/venv/bin/python", "-m", "gunicorn", "--bind", "0.0.0.0:5000", "--forwarded-allow-ips=*", "-w", "4", "--log-level", "$MEMOS_LOG_LEVEL", "--capture-output", "memos_public_proxy.app:app"]
+ENTRYPOINT ["/usr/bin/python3.11", "-m", "gunicorn", "--bind", "0.0.0.0:5000", "--forwarded-allow-ips=*", "-w", "4", "--log-level", "$MEMOS_LOG_LEVEL", "--capture-output", "memos_public_proxy.app:app"]
 CMD []
