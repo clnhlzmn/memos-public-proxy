@@ -71,12 +71,9 @@ def get_memo(id: str):
 
     app.logger.info(f"memo {id} not found in cache, generating html")
 
-    # Escape hashtags in the first and last lines
-    lines = content.split("\n")
-    if lines:
-        lines[0] = re.sub(HASHTAG_PATTERN, lambda m: rf"\{m.group(0)}", lines[0])
-        lines[-1] = re.sub(HASHTAG_PATTERN, lambda m: rf"\{m.group(0)}", lines[-1])
-    content = "\n".join(lines)
+    # Escape hashtags so Memos tags (#tag anywhere in the content) render
+    # literally instead of being parsed as Markdown headings.
+    content = HASHTAG_PATTERN.sub(lambda m: rf"\{m.group(0)}", content)
 
     # Prepend other HTML
     content = f"{HTML}\n\n{content}"
