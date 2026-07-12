@@ -22,10 +22,11 @@ EXTRAS = [
     "header-ids",
     "latex",
     "mermaid",
+    # Require a space after "#" for ATX headings, so Memos tags like "#tag"
+    # are left as text instead of being parsed as headings.
+    "tag-friendly",
 ]
 ICON_PATH = "/logo.webp"
-
-HASHTAG_PATTERN = re.compile(r"#[^\s]+")
 HTML = "\n".join(p.read_text() for p in (pathlib.Path(__file__).parent / "html").glob("*.html"))
 
 app.logger.setLevel(MEMOS_LOG_LEVEL)
@@ -70,10 +71,6 @@ def get_memo(id: str):
         return cache_path.read_text()
 
     app.logger.info(f"memo {id} not found in cache, generating html")
-
-    # Escape hashtags so Memos tags (#tag anywhere in the content) render
-    # literally instead of being parsed as Markdown headings.
-    content = HASHTAG_PATTERN.sub(lambda m: rf"\{m.group(0)}", content)
 
     # Prepend other HTML
     content = f"{HTML}\n\n{content}"
