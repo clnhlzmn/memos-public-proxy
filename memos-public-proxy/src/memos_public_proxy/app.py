@@ -53,7 +53,7 @@ def _file_path(attachment_name: str, filename: str):
 def get_memo(id: str):
     path = _memo_path(id)
     app.logger.info(f"GET {path}")
-    response = requests.get(f"{MEMOS_HOST}/api/v1{path}")
+    response = requests.get(f"{MEMOS_HOST}/api{path}")
 
     if response.status_code != 200:
         return _handle_error(path, response)
