@@ -43,6 +43,8 @@ I was inspired by the approach taken by Immich Public Proxy and I wanted somethi
 | `MEMOS_LOG_LEVEL` | Log level for the proxy application and for the Gunicorn server. Uses [Gunicorn levels](https://docs.gunicorn.org/en/stable/settings.html#loglevel). | `error` |
 | `MEMOS_HOST` | The URL for the Memos server instance. | http://memos:5230 |
 
+> Note: This proxy targets the unversioned Memos API (`/api/...`) introduced in Memos 26.10.0. Older Memos releases only serve `/api/v1/...` and are not supported by current builds of the proxy.
+
 # Example Docker Compose File
 
 > Note: Memos 0.25.1 includes support for using `MEMOS_INSTANCE_URL` when copying a memo link using the "Copy Link" button. What does this mean? You can visit your Memos instance at memos.private.example.com, create a public memo, click "Copy Link", and have a ready-to-share public link of the form `memos.public.example.com/memos/<memo id>`.
@@ -52,7 +54,7 @@ services:
 
   # Memos instance
   memos:
-    image: neosmemo/memos:0.25.1
+    image: neosmemo/memos:26.10.0
     restart: unless-stopped
     depends_on:
       - db
